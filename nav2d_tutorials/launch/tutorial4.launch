@@ -5,6 +5,7 @@
 
 	<!-- Start Stage simulator with a given environment -->
 	<node name="Stage" pkg="stage_ros" type="stageros" args="$(find nav2d_tutorials)/world/tutorial4.world">
+		<remap from="base_scan" to="scan" />
 		<param name="base_watchdog_timeout" value="0" />
 	</node>
 
@@ -21,7 +22,6 @@
 		<rosparam file="$(find nav2d_tutorials)/param/ros.yaml"/>
 
 		<node name="Mapper" pkg="nav2d_karto" type="mapper">
-			<remap from="scan" to="base_scan"/>
 			<remap from="karto_in" to="/shared_scans_r2"/>
 			<remap from="karto_out" to="/shared_scans_r1"/>
 			<rosparam file="$(find nav2d_tutorials)/param/mapper.yaml"/>
@@ -36,7 +36,6 @@
 
 		<!-- Start the Operator to control the simulated robot -->
 		<node name="Operator" pkg="nav2d_operator" type="operator" >
-			<remap from="scan" to="base_scan"/>
 			<rosparam file="$(find nav2d_tutorials)/param/operator.yaml"/>
 			<rosparam file="$(find nav2d_tutorials)/param/costmap.yaml" ns="local_map" />
 		</node>
@@ -50,7 +49,6 @@
 		<node name="Explore" pkg="nav2d_navigator" type="explore_client" />
 
 		<node name="Mapper" pkg="nav2d_karto" type="mapper">
-			<remap from="scan" to="base_scan"/>
 			<remap from="karto_in" to="/shared_scans_r1"/>
 			<remap from="karto_out" to="/shared_scans_r2"/>
 			<rosparam file="$(find nav2d_tutorials)/param/mapper.yaml"/>
