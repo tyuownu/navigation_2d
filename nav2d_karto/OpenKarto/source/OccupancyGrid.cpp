@@ -91,7 +91,7 @@ namespace karto
     kt_int32s width, height;
     Vector2d offset;
     OccupancyGrid::ComputeDimensions(rScans, resolution, width, height, offset);
-    OccupancyGrid* pOccupancyGrid = new OccupancyGrid(width, height, offset, resolution);
+    OccupancyGrid* pOccupancyGrid = new OccupancyGrid(width+5, height+5, offset, resolution);
     pOccupancyGrid->CreateFromScans(rScans);
 
     return pOccupancyGrid;      

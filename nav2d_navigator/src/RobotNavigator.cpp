@@ -195,11 +195,12 @@ bool RobotNavigator::preparePlan()
 
 bool RobotNavigator::createPlan()
 {	
-	ROS_DEBUG("Map-Value of goal point is %d, lethal threshold is %d.", mCurrentMap.getData(mGoalPoint), mCostLethal);
+	ROS_INFO("Map-Value of goal point is %d, lethal threshold is %d.", mCurrentMap.getData(mGoalPoint), mCostLethal);
 	
 	unsigned int goal_x = 0, goal_y = 0;
 	if(mCurrentMap.getCoordinates(goal_x,goal_y,mGoalPoint))
 	{
+		ROS_INFO("Goal: x = %d, y = %d", goal_x, goal_y);
 		visualization_msgs::Marker marker;
 		marker.header.frame_id = "/map";
 		marker.header.stamp = ros::Time();
@@ -478,10 +479,10 @@ bool RobotNavigator::generateCommand()
 		
 	if(mCurrentPlan[mStartPoint] > 1.0 || mCurrentPlan[mStartPoint] < 0)
 	{
-		msg.Velocity = 1.0;
+		msg.Velocity = 0.5;
 	}else
 	{
-		msg.Velocity = 0.5 + (mCurrentPlan[mStartPoint] / 2.0);
+		msg.Velocity = 0.5;
 	}
 	mCommandPublisher.publish(msg);
 	return true;
@@ -500,7 +501,7 @@ void RobotNavigator::receiveGetMapGoal(const nav2d_navigator::GetFirstMapGoal::C
 	mStatus = NAV_ST_RECOVERING;
 	nav2d_operator::cmd msg;
 	msg.Turn = 0;
-	msg.Velocity = 1.0;
+	msg.Velocity = 0.5;
 	msg.Mode = 0;
 	
 	nav2d_navigator::GetFirstMapFeedback f;
@@ -641,7 +642,7 @@ void RobotNavigator::receiveMoveGoal(const nav2d_navigator::MoveToPosition2DGoal
 		return;
 	}
 	
-	ROS_DEBUG("Received Goal: %.2f, %.2f (in frame '%s')", goal->target_pose.x, goal->target_pose.y, goal->header.frame_id.c_str());
+	ROS_INFO("Received Goal: %.2f, %.2f (in frame '%s')", goal->target_pose.x, goal->target_pose.y, goal->header.frame_id.c_str());
 
 	// Start navigating according to the generated plan
 	Rate loopRate(FREQUENCY);
@@ -841,13 +842,19 @@ void RobotNavigator::receiveExploreGoal(const nav2d_navigator::ExploreGoal::Cons
 			if(preparePlan())
 			{
 				int result = mExplorationPlanner->findExplorationTarget(&mCurrentMap, mStartPoint, mGoalPoint);
+				ROS_INFO("exploration: start = %d, end = %d.", mStartPoint, mGoalPoint);
+				unsigned int x_index = 0, y_index = 0;
+				mCurrentMap.getCoordinates(x_index, y_index, mStartPoint);
+				ROS_INFO("start: x = %d, y = %d", x_index, y_index);
 				switch(result)
 				{
 				case EXPL_TARGET_SET:
+					std::cout << "EXPL_TARGET_SET" << std::endl;
 					success = createPlan();
 					mStatus = NAV_ST_EXPLORING;
 					break;
 				case EXPL_FINISHED:
+					std::cout << "EXPL_FINISHED" << std::endl;
 					{
 						nav2d_navigator::ExploreResult r;
 						r.final_pose.x = mCurrentPositionX;
@@ -859,6 +866,7 @@ void RobotNavigator::receiveExploreGoal(const nav2d_navigator::ExploreGoal::Cons
 					ROS_INFO("Exploration has finished.");
 					return;
 				case EXPL_WAITING:
+					std::cout << "EXPL_WITING" << std::endl;
 					mStatus = NAV_ST_WAITING;
 					{
 						nav2d_operator::cmd stopMsg;
@@ -869,6 +877,7 @@ void RobotNavigator::receiveExploreGoal(const nav2d_navigator::ExploreGoal::Cons
 					ROS_INFO("Exploration is waiting.");
 					break;
 				case EXPL_FAILED:
+					std::cout << "EXPL_FAILED" << std::endl;
 					break;
 				default:
 					ROS_ERROR("Exploration planner returned invalid status code: %d!", result);
