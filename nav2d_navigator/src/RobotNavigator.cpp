@@ -842,10 +842,10 @@ void RobotNavigator::receiveExploreGoal(const nav2d_navigator::ExploreGoal::Cons
 			if(preparePlan())
 			{
 				int result = mExplorationPlanner->findExplorationTarget(&mCurrentMap, mStartPoint, mGoalPoint);
-				ROS_INFO("exploration: start = %d, end = %d.", mStartPoint, mGoalPoint);
+				ROS_INFO("exploration: start = %u, end = %u.", mStartPoint, mGoalPoint);
 				unsigned int x_index = 0, y_index = 0;
 				mCurrentMap.getCoordinates(x_index, y_index, mStartPoint);
-				ROS_INFO("start: x = %d, y = %d", x_index, y_index);
+				ROS_INFO("start: x = %u, y = %u", x_index, y_index);
 				switch(result)
 				{
 				case EXPL_TARGET_SET:
