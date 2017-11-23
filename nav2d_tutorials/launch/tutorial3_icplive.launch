@@ -21,9 +21,9 @@
 	<node name="Mapper" pkg="nav2d_karto" type="mapper">
 		<rosparam file="$(find nav2d_tutorials)/param/mapper.yaml"/>
 	</node>
+    -->
 
     <include file="$(find mrpt_icp_slam_live_2d)/launch/nav2d_icp.launch" />
-    -->
 
 	<!-- Start the Navigator to move the robot autonomously -->
 	<node name="Navigator" pkg="nav2d_navigator" type="navigator">
